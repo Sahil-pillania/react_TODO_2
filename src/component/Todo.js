@@ -4,9 +4,26 @@ import todoImg from "../images/todo.svg";
 function Todo() {
   const [inputData, setInputData] = useState("");
   const [items, setItems] = useState([]);
+  const [toggleSubmit, setToggleSubmit] = useState(true);
+  const [isEditItem, setIsEditItem] = useState(null);
 
   const addItem = () => {
     if (!inputData) {
+      alert("Please input something ...");
+    } else if (inputData && !toggleSubmit) {
+      setItems(
+        items.map((elem) => {
+          if (elem.id === isEditItem) {
+            return { ...elem, name: inputData };
+          }
+          return elem;
+        })
+      );
+      setToggleSubmit(true);
+
+      setInputData("");
+
+      setIsEditItem(null);
     } else {
       const allInputData = {
         id: new Date().getTime().toString(),
@@ -28,7 +45,17 @@ function Todo() {
     setItems([]);
   };
 
-  const editItem = () => {};
+  const editItem = (id) => {
+    let newEditItem = items.find((elem) => {
+      return elem.id === id;
+    });
+
+    setToggleSubmit(false);
+
+    setInputData(newEditItem.name);
+
+    setIsEditItem(id);
+  };
 
   return (
     <>
@@ -44,15 +71,21 @@ function Todo() {
               type="text"
               placeholder=" ✏️ Add Items... "
               value={inputData}
-              onChange={(e) => {
-                setInputData(e.target.value);
-              }}
+              onChange={(e) => setInputData(e.target.value)}
             />
-            <i
-              className="fa fa-solid fa-plus add-btn"
-              title="Add Item"
-              onClick={addItem}
-            ></i>
+            {toggleSubmit ? (
+              <i
+                className="fa fa-solid fa-plus add-btn"
+                title="Add Item"
+                onClick={addItem}
+              ></i>
+            ) : (
+              <i
+                className="fa fa-edit add-btn"
+                title="Edit the Item"
+                onClick={addItem}
+              ></i>
+            )}
           </div>
 
           <div className="showItems">
